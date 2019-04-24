@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--==============以下内容为applicationContext-dao配置================-->
+    <!--开启注解模式-->
+    <context:annotation-config />
+
+    <!-- 数据库连接池 -->
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!-- 数据库连接池 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="${jdbc.driver}"></property>
+    <property name="url" value="${jdbc.url}"></property>
+    <property name="username" value="${jdbc.userdbname}"></property>
+    <property name="password" value="${jdbc.password}"></property>
+    <property name="maxIdle" value="${jdbc.maxIdle}"></property>
+    <property name="maxActive" value="${jdbc.maxActive}"></property>
+    </bean>
+
+    <!-- 让spring管理sqlsessionfactory 使用mybatis和spring整合包中的 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 加载mybatis的全局配置文件 -->
+        <property name="configLocation" value="classpath:sqlMapperConfig.xml"/>
+        <!-- 加载mapper.xml路径-->
+        <property name="mapperLocations" value="classpath:mapper/UserMapper.xml"></property>
+    </bean>
+    <!--配置mapper扫描包-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.wj.mapper"/>
+    </bean>
+
+    <!--=======以下内容为applicationContext-service配置=============-->
+    <!--自动扫描service-->
+    <context:component-scan base-package="com.wj.service" />
+
+    <!-- 事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 通知 -->
+    <!--<tx:advice id="txAdvice" transaction-manager="transactionManager">-->
+        <!--<tx:attributes>-->
+            <!--&lt;!&ndash; 传播行为 &ndash;&gt;-->
+            <!--<tx:method name="save*" propagation="REQUIRED" />-->
+            <!--<tx:method name="insert*" propagation="REQUIRED" />-->
+            <!--<tx:method name="add*" propagation="REQUIRED" />-->
+            <!--<tx:method name="create*" propagation="REQUIRED" />-->
+            <!--<tx:method name="delete*" propagation="REQUIRED" />-->
+            <!--<tx:method name="update*" propagation="REQUIRED" />-->
+            <!--<tx:method name="find*" propagation="SUPPORTS" read-only="true" />-->
+            <!--<tx:method name="select*" propagation="SUPPORTS" read-only="true" />-->
+            <!--<tx:method name="get*" propagation="SUPPORTS" read-only="true" />-->
+        <!--</tx:attributes>-->
+    <!--</tx:advice>-->
+    <!--&lt;!&ndash; 切面 &ndash;&gt;-->
+    <!--<aop:config>-->
+        <!--<aop:advisor advice-ref="txAdvice"-->
+                     <!--pointcut="execution(* com.wj.service.*.*(..))" />-->
+    <!--</aop:config>-->
+
+
+    </beans>
